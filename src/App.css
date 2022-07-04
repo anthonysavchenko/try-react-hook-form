@@ -6,12 +6,12 @@
   padding: 30px;
 }
 
-.form {
+.form, .noForm {
   display: flex;
   flex-direction: column;
   max-width: 250px;
 }
 
-.form > * {
+.form > *, .noForm > * {
   margin: 10px;
 }

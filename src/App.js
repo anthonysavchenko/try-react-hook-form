@@ -1,20 +1,14 @@
-import { useForm } from 'react-hook-form';
+import React from 'react';
+import ButtonNoForm from './components/buttonNoForm';
+import SimpleForm from './components/simpleForm';
 import './App.css';
 
-function App() {
-  const {register, handleSubmit, watch, formState: {errors}} = useForm();
-  const onSubmit = data => console.log(data);
-  
-  console.log(watch("example"));
 
+function App() {
   return (
     <div className="App">
-      <form className="form" onSubmit={handleSubmit(onSubmit)}>
-        <input defaultValue={"default"} {...register("example")} />
-        <input {...register("exampleRequired", {required: true})} />
-        {errors.exampleRequired && <span>This field is required</span>}
-        <input type="submit"/>
-      </form>
+      <SimpleForm />
+      <ButtonNoForm />
     </div>
   );
 }
