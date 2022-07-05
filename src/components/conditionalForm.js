@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 
 export default function ConditionalForm() {
-  const {register, unregister, handleSubmit, formState: {errors}} = useForm();
+  const {register, handleSubmit, formState: {errors}} = useForm();
   const onSubmit = data => console.log(data);
 
   const [valA, setValA] = React.useState('');
@@ -12,51 +12,44 @@ export default function ConditionalForm() {
   const [valE, setValE] = React.useState('');
   const [valF, setValF] = React.useState('');
 
-  React.useEffect(() => {
-    const vals = [valA, valB, valC, valD, valE, valF].filter(val => !val);
-    if (vals.length > 3) {
-      if (!valA) register("a", {required: true, onChange: (event) => {setValA(event.target.value);}});
-      if (!valB) register("b", {required: true, onChange: (event) => {setValB(event.target.value);}});
-      if (!valC) register("c", {required: true, onChange: (event) => {setValC(event.target.value);}});
-      if (!valD) register("d", {required: true, onChange: (event) => {setValD(event.target.value);}});
-      if (!valE) register("e", {required: true, onChange: (event) => {setValE(event.target.value);}});
-      if (!valF) register("f", {required: true, onChange: (event) => {setValF(event.target.value);}});
+  const validate = React.useCallback(value => {
+    if (!value) {
+      const emptyValues = [valA, valB, valC, valD, valE, valF].filter(val => !val);
+      console.log('emptyValues', emptyValues);
+      if (emptyValues.length > 3) {
+        console.log('bad validation');
+        return false;
+      }
     }
-    else {
-      if (!valA) unregister("a");
-      if (!valB) unregister("b");
-      if (!valC) unregister("c");
-      if (!valD) unregister("d");
-      if (!valE) unregister("e");
-      if (!valF) unregister("f");
-    }
-  }, [valA, valB, valC, valD, valE, valF, register, unregister]);
+    console.log('good validation');
+    return true;
+  }, [valA, valB, valC, valD, valE, valF]);
 
   console.log(errors);
   return (
     <div className="noForm">
       <div>
-        <input {...register("a", {onChange: (event) => {setValA(event.target.value);}})} />
+        <input {...register("a", {onChange: (event) => {setValA(event.target.value);}, validate, deps: ["a", "b", "c", "d", "e", "f"]})} />
         {errors.a && <span style={{color: 'red'}}>*</span>}
       </div>
       <div>
-        <input {...register("b", {onChange: (event) => {setValB(event.target.value);}})} />
+        <input {...register("b", {onChange: (event) => {setValB(event.target.value);}, validate, deps: ["a", "b", "c", "d", "e", "f"]})} />
         {errors.b && <span style={{color: 'red'}}>*</span>}
       </div>
       <div>
-        <input {...register("c", {onChange: (event) => {setValC(event.target.value);}})} />
+        <input {...register("c", {onChange: (event) => {setValC(event.target.value);}, validate, deps: ["a", "b", "c", "d", "e", "f"]})} />
         {errors.c && <span style={{color: 'red'}}>*</span>}
       </div>
       <div>
-        <input {...register("d", {onChange: (event) => {setValD(event.target.value);}})} />
+        <input {...register("d", {onChange: (event) => {setValD(event.target.value);}, validate, deps: ["a", "b", "c", "d", "e", "f"]})} />
         {errors.d && <span style={{color: 'red'}}>*</span>}
       </div>
       <div>
-        <input {...register("e", {onChange: (event) => {setValE(event.target.value);}})} />
+        <input {...register("e", {onChange: (event) => {setValE(event.target.value);}, validate, deps: ["a", "b", "c", "d", "e", "f"]})} />
         {errors.e && <span style={{color: 'red'}}>*</span>}
       </div>
       <div>
-        <input {...register("f", {onChange: (event) => {setValF(event.target.value);}})} />
+        <input {...register("f", {onChange: (event) => {setValF(event.target.value);}, validate, deps: ["a", "b", "c", "d", "e", "f"]})} />
         {errors.f && <span style={{color: 'red'}}>*</span>}
       </div>
       <button onClick={handleSubmit(onSubmit)}>Submit</button>
