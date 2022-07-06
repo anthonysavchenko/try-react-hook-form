@@ -2,8 +2,8 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 
 export default function ConditionalForm() {
-  const {register, handleSubmit, formState: {errors}} = useForm();
-  const onSubmit = data => console.log(data);
+  const {register, handleSubmit, trigger, formState: {errors, isSubmitted}} = useForm({shouldUnregister: true});
+  const onSubmit = data => console.log('data', data);
 
   const [valA, setValA] = React.useState('');
   const [valB, setValB] = React.useState('');
@@ -12,46 +12,37 @@ export default function ConditionalForm() {
   const [valE, setValE] = React.useState('');
   const [valF, setValF] = React.useState('');
 
+  const [more, setMore] = React.useState(false);
+
   const validate = React.useCallback(value => {
     if (!value) {
-      const emptyValues = [valA, valB, valC, valD, valE, valF].filter(val => !val);
-      console.log('emptyValues', emptyValues);
-      if (emptyValues.length > 3) {
-        console.log('bad validation');
-        return false;
-      }
+      const notEmptyValues = (more ? [valA, valB, valC, valD, valE, valF] : [valA, valB, valC]).filter(val => val);
+      return notEmptyValues.length >= 3;
     }
-    console.log('good validation');
     return true;
-  }, [valA, valB, valC, valD, valE, valF]);
+  }, [valA, valB, valC, valD, valE, valF, more]);
+
+  React.useEffect(() => {
+    if (more && isSubmitted) {
+      trigger(["d", "e", "f"]);
+    };
+  }, [more, isSubmitted, trigger]);
+
+  const errorStyle = {boxShadow: '0 0 0 2px red'};
 
   console.log(errors);
   return (
     <div className="noForm">
-      <div>
-        <input {...register("a", {onChange: (event) => {setValA(event.target.value);}, validate, deps: ["a", "b", "c", "d", "e", "f"]})} />
-        {errors.a && <span style={{color: 'red'}}>*</span>}
-      </div>
-      <div>
-        <input {...register("b", {onChange: (event) => {setValB(event.target.value);}, validate, deps: ["a", "b", "c", "d", "e", "f"]})} />
-        {errors.b && <span style={{color: 'red'}}>*</span>}
-      </div>
-      <div>
-        <input {...register("c", {onChange: (event) => {setValC(event.target.value);}, validate, deps: ["a", "b", "c", "d", "e", "f"]})} />
-        {errors.c && <span style={{color: 'red'}}>*</span>}
-      </div>
-      <div>
-        <input {...register("d", {onChange: (event) => {setValD(event.target.value);}, validate, deps: ["a", "b", "c", "d", "e", "f"]})} />
-        {errors.d && <span style={{color: 'red'}}>*</span>}
-      </div>
-      <div>
-        <input {...register("e", {onChange: (event) => {setValE(event.target.value);}, validate, deps: ["a", "b", "c", "d", "e", "f"]})} />
-        {errors.e && <span style={{color: 'red'}}>*</span>}
-      </div>
-      <div>
-        <input {...register("f", {onChange: (event) => {setValF(event.target.value);}, validate, deps: ["a", "b", "c", "d", "e", "f"]})} />
-        {errors.f && <span style={{color: 'red'}}>*</span>}
-      </div>
+      <input style={errors.a && errorStyle} {...register("a", {onChange: (event) => {setValA(event.target.value);}, validate, deps: ["a", "b", "c", "d", "e", "f"]})} />
+      <input style={errors.b && errorStyle} {...register("b", {onChange: (event) => {setValB(event.target.value);}, validate, deps: ["a", "b", "c", "d", "e", "f"]})} />
+      <input style={errors.c && errorStyle} {...register("c", {onChange: (event) => {setValC(event.target.value);}, validate, deps: ["a", "b", "c", "d", "e", "f"]})} />
+      {!more && <button onClick={() => setMore(true)}>More</button>}
+      {more && <>
+        <button onClick={() => setMore(false)}>Less</button>
+        <input style={errors.d && errorStyle} {...register("d", {onChange: (event) => {setValD(event.target.value);}, validate, deps: ["a", "b", "c", "d", "e", "f"]})} />
+        <input style={errors.e && errorStyle} {...register("e", {onChange: (event) => {setValE(event.target.value);}, validate, deps: ["a", "b", "c", "d", "e", "f"]})} />
+        <input style={errors.f && errorStyle} {...register("f", {onChange: (event) => {setValF(event.target.value);}, validate, deps: ["a", "b", "c", "d", "e", "f"]})} />
+      </>}
       <button onClick={handleSubmit(onSubmit)}>Submit</button>
     </div>
   );
